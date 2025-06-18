@@ -1,34 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PAGO TRANSBANK</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='assets/bootstrap-5.1.3/css/bootstrap.min.css') }}">
-</head>
-
-<body>
-  <div class="container-sm mt-5">
-    <form class="form-control" method="POST" action="/transbank-pay">
-      <div class="mb-3 row">
-        <label for="buy-id" class="col-sm-2 col-form-label">ID Producto</label>
-        <div class="col-sm-10">
-          <input type="text" readonly class="form-control-plaintext" id="buy-order" name="buy-order" value="{{context.buy_order}}">
-        </div>
-      </div>
-      <div class="mb-3 row">
-        <label for="amount" class="col-sm-2 col-form-label">Valor</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="amount" name="amount" value="{{context.amount}}">
-        </div>
-      </div>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button class="btn btn-warning mx-4 my-4 col-2"><img src="{{ url_for('static', filename='assets/img/webpay-desktop-logo_color.svg') }}" alt=""></button>
-      </div>      
-    </form>
+<form class="form-control" method="POST" action="/transbank-pay" onsubmit="return validateForm()">
+  <div class="mb-3 row">
+    <label for="product" class="col-sm-2 col-form-label">Producto</label>
+    <div class="col-sm-10">
+      <select class="form-select" id="product" name="product" onchange="updateDetails()" required>
+        <option value="" disabled selected>Seleccione un producto</option>
+        <option value="P001" data-amount="88139">VALV. COMPUERTA ENOLGAS 2 1/2" LATON</option>
+        <option value="P002" data-amount="18826">LLAVE DE JARDIN ENOLGAS 1/2'-MANG.</option>
+        <option value="P003" data-amount="102305">VLV MARIPOSA PVC FLOWMAK 160 MM PALANCA</option>
+      </select>
+    </div>
   </div>
-</body>
 
-</html>
+  <input type="hidden" id="buy-order" name="buy-order">
+  <input type="hidden" id="amount" name="amount">
+
+  <div class="mb-3 row">
+
+    <div class="col-sm-10">
+      <p id="summary">Seleccione un producto para ver el detalle</p>
+    </div>
+  </div>
+
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <button class="btn btn-warning mx-4 my-4 col-2">
+      <img src="{{ url_for('static', filename='assets/img/webpay-desktop-logo_color.svg') }}" alt="Pagar">
+    </button>
+  </div>
+</form>
+
+<script>
+  function updateDetails() {
+    const select = document.getElementById('product');
+    const selected = select.options[select.selectedIndex];
+    const productId = selected.value;
+    const amount = selected.getAttribute('data-amount');
+    const orderId = 'ORD-' + Date.now(); // ejemplo: ORD-1623445567890
+
+    document.getElementById('buy-order').value = orderId;
+    document.getElementById('amount').value = amount;
+    document.getElementById('summary').innerText = `Producto: ${selected.text}, 
+    
+    Precio: $${parseInt(amount).toLocaleString()}`;
+  }
+
+  function validateForm() {
+    const buyOrder = document.getElementById('buy-order').value;
+    const amount = document.getElementById('amount').value;
+    if (!buyOrder || !amount) {
+      alert("Debe seleccionar un producto válido.");
+      return false;
+    }
+    return true;
+  }
+</script>

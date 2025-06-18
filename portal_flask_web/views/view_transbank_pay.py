@@ -22,11 +22,10 @@ def app_transbank_pay_view(app):
         print('METHOD', request.method)
 
         if request.method == 'GET':
-            buy_order = '10029393040405'
-            amount = 250000
+        
             context = {
-                'buy_order': buy_order,
-                'amount': amount
+                'buy_order': '',
+                'amount': ''
             }
             return render_template('transbank-pay.html', context=context)
         
